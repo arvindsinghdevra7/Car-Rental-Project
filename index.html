@@ -1,10 +1,3 @@
-<?php
-session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.html");
-    exit();
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,7 +6,7 @@ if (!isset($_SESSION['user_id'])) {
     <title>Lovely Cars - Rent a Car Online</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="Lovely Cars - Rent a car online" name="keywords">
-    <meta content="This is a car rental website. You can rent a car in Jalandhar, punjab." name="description">
+    <meta content="This is a car rental website. You can rent a car in Udaipur, Rajasthan." name="description">
 
     <!-- Favicon to show in browser tab -->
     <link href="img/favicon.ico" rel="icon">
@@ -38,6 +31,19 @@ if (!isset($_SESSION['user_id'])) {
 </head>
 
 <body>
+    <script>
+        // Check if user is logged in
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+        
+        // Add logout function
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'login.html';
+        }
+    </script>
+
     <!-- Topbar Start -->
     <div class="container-fluid bg-dark py-3 px-lg-5 d-none d-lg-block">
         <div class="row">
@@ -46,7 +52,7 @@ if (!isset($_SESSION['user_id'])) {
                     <span class="text-body">Quick Support: &nbsp;</span>
                     <a class="text-body pr-3" href="tel:+918619221676"><i class="fa fa-phone-alt mr-2"></i>+91-8619221676</a>
                     <span class="text-body">|</span>
-                    <a class="text-body px-3" href="mailto:arvindsinghdevra143@gmail.com"><i class="fa fa-envelope mr-2"></i>arvindsinghdevra143@gmail.com</a>
+                    <a class="text-body px-3" href="mailto:lovelycar@gmail.com"><i class="fa fa-envelope mr-2"></i>lovelycar@gmail.com</a>
                 </div>
             </div>
             <div class="col-md-6 text-center text-lg-right">
@@ -67,6 +73,7 @@ if (!isset($_SESSION['user_id'])) {
                     <a class="text-body pl-3" href="https://www.youtube.com/">
                         <i class="fab fa-youtube"></i>
                     </a>
+                    <button onclick="logout()" class="btn btn-primary ml-3">Logout</button>
                 </div>
             </div>
         </div>
@@ -113,51 +120,118 @@ if (!isset($_SESSION['user_id'])) {
 
 
     <!-- Search Start -->
-    <div class="container-fluid bg-white pt-3 px-lg-5">
+    <div class="container-fluid bg-white pt-3 px-lg-5" id="booking-section">
         <div class="row mx-n2">
-            <div class="col-xl-2 col-lg-4 col-md-6 px-2">
-                <select class="custom-select px-4 mb-3" style="height: 50px;">
-                    <option selected>Pickup Location</option>
-                    <option value="1">Jalandhar</option>
-                    <option value="2">Ludhiana</option>
-                    <option value="3">Phagwara</option>
-                </select>
-            </div>
-            <div class="col-xl-2 col-lg-4 col-md-6 px-2">
-                <select class="custom-select px-4 mb-3" style="height: 50px;">
-                    <option selected>Drop Location</option>
-                    <option value="1">Jalandhar</option>
-                    <option value="2">Ludhiana</option>
-                    <option value="3">Phagwara</option>
-                </select>
-            </div>
-            <div class="col-xl-2 col-lg-4 col-md-6 px-2">
-                <div class="date mb-3" id="date" data-target-input="nearest">
-                    <input type="text" class="form-control p-4 datetimepicker-input" placeholder="Pickup Date"
-                        data-target="#date" data-toggle="datetimepicker" />
+            <form name="bookingForm" action="save_booking.php" method="POST" onsubmit="return validateForm()">
+                <div class="row mx-n2" style="width: 100%;">
+                    <div class="col-xl-2 col-lg-4 col-md-6 px-2">
+                        <select class="custom-select px-4 mb-3" style="height: 50px;" name="pickup_location" required>
+                            <option value="">Pickup Location</option>
+                            <option value="Udaipur">Udaipur</option>
+                            <option value="Jaipur">Jaipur</option>
+                            <option value="Jodhpur">Jodhpur</option>
+                            <option value="Bikaner">Bikaner</option>
+                            <option value="Ajmer">Ajmer</option>
+                        </select>
+
+                    </div>
+                    <div class="col-xl-2 col-lg-4 col-md-6 px-2">
+                        <select class="custom-select px-4 mb-3" style="height: 50px;" name="drop_location" required>
+                            <option value="">Drop Location</option>
+                            <option value="Udaipur">Udaipur</option>
+                            <option value="Jaipur">Jaipur</option>
+                            <option value="Jodhpur">Jodhpur</option>
+                            <option value="Bikaner">Bikaner</option>
+                            <option value="Ajmer">Ajmer</option>
+                        </select>
+
+                    </div>
+                    <div class="col-xl-2 col-lg-4 col-md-6 px-2">
+                        <input type="date" class="form-control mb-3" name="date" required 
+                               min="" onchange="updateTimeMin(this.value)">
+                    </div>
+                    <div class="col-xl-2 col-lg-4 col-md-6 px-2">
+                        <input type="time" class="form-control mb-3" name="time" required 
+                               min="" step="900">
+                    </div>
+                    <div class="col-xl-2 col-lg-4 col-md-6 px-2">
+                        <select class="custom-select px-4 mb-3" style="height: 50px;" name="car_model" required>
+                            <option value="">Select A Car</option>
+                            <option value="Fortuner">Fortuner</option>
+                            <option value="Verna">Verna</option>
+                            <option value="Mustang">Mustang</option>
+                            <option value="BMW X5">BMW X5</option>
+                        </select>
+                    </div>
+                    <div class="col-xl-2 col-lg-4 col-md-6 px-2">
+                        <button type="submit" class="btn btn-primary btn-block mb-3" style="height: 50px;">Book Now</button>
+                    </div>
                 </div>
-            </div>
-            <div class="col-xl-2 col-lg-4 col-md-6 px-2">
-                <div class="time mb-3" id="time" data-target-input="nearest">
-                    <input type="text" class="form-control p-4 datetimepicker-input" placeholder="Pickup Time"
-                        data-target="#time" data-toggle="datetimepicker" />
-                </div>
-            </div>
-            <div class="col-xl-2 col-lg-4 col-md-6 px-2">
-                <select class="custom-select px-4 mb-3" style="height: 50px;">
-                    <option selected>Select A Car</option>
-                    <option value="1">Fortuner</option>
-                    <option value="2">Verna</option>
-                    <option value="3">Mustang</option>
-                    <option value="3">BMW X 5</option>
-                </select>
-            </div>
-            <div class="col-xl-2 col-lg-4 col-md-6 px-2">
-                <button class="btn btn-primary btn-block mb-3" type="submit" style="height: 50px;">Search</button>
-            </div>
+            </form>
         </div>
     </div>
     <!-- Search End -->
+
+    <!-- After Search End and before About Start, add this new section -->
+    <div id="bookingTracker" class="container-fluid py-5" style="display: none;">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title text-primary">Your Booking Status</h3>
+                            <div class="booking-progress mb-4">
+                                <div class="progress" style="height: 5px;">
+                                    <div id="bookingProgressBar" class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <span class="badge badge-primary">Confirmed</span>
+                                    <span class="badge badge-secondary">Driver Assigned</span>
+                                    <span class="badge badge-secondary">On the Way</span>
+                                    <span class="badge badge-secondary">Arrived</span>
+                                </div>
+                            </div>
+                            
+                            <div class="driver-details mt-4">
+                                <h5>Driver Details</h5>
+                                <div class="d-flex align-items-center">
+                                    <img src="driverimg.jpg" alt="Driver" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;">
+                                    <div class="ml-3">
+                                        <h6 id="driverName">John Doe</h6>
+                                        <p class="mb-0">Rating: ⭐ 4.8</p>
+                                        <p class="mb-0" id="driverPhone">Phone: +91 98765 43210</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="vehicle-details mt-4">
+                                <h5>Vehicle Details</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Vehicle:</strong> <span id="vehicleModel">Toyota Fortuner</span></p>
+                                        <p><strong>Color:</strong> <span id="vehicleColor">White</span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Number:</strong> <span id="vehicleNumber">RJ 27 CA 1234</span></p>
+                                        <p><strong>ETA:</strong> <span id="eta">10 mins</span></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="booking-actions mt-4">
+                                <button class="btn btn-primary mr-2" onclick="contactDriver()">
+                                    <i class="fa fa-phone"></i> Call Driver
+                                </button>
+                                <button class="btn btn-danger" onclick="cancelBooking()">
+                                    <i class="fa fa-times"></i> Cancel Booking
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!--Animated car hero starts here-->
 <div class="hero">
@@ -305,8 +379,8 @@ if (!isset($_SESSION['user_id'])) {
                 <div class="py-5">
                     <h1 class="display-1 text-uppercase text-primary mb-4">50% OFF</h1>
                     <h1 class="text-uppercase text-light mb-4">Special Offer For New Members</h1>
-                    <p class="mb-4">1st Jan to 30th Jan 2023&nbsp;<span style="color:brown">Hurry up!</span></p>
-                    <a class="btn btn-primary mt-2 py-3 px-5" href="">Register Now</a>
+                    <p class="mb-4">2nd Feb to 30th March 2025&nbsp;<span style="color:brown">Hurry up!</span></p>
+                    <a class="btn btn-primary mt-2 py-3 px-5" href="https://docs.google.com/forms/d/1P5-Kfkcz3wdBPJZDLalT6NaTqF2MTh5LKuqvS_t7wjo/edit">Register Now</a>
                 </div>
             </div>
         </div>
@@ -322,8 +396,8 @@ if (!isset($_SESSION['user_id'])) {
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-2">
                     <div class="rent-item mb-4">
-                        <img class="img-fluid mb-4" src="img/car-rent-1.png" alt="">
-                        <h4 class="text-uppercase mb-4">Mercedes Benz R3</h4>
+                        <img class="img-fluid mb-4" src="img/car-rent-1.avif" alt="">
+                        <h4 class="text-uppercase mb-4">Mahindra Scorpio</h4>
                         <div class="d-flex justify-content-center mb-4">
                             <div class="px-2">
                                 <i class="fa fa-car text-primary mr-1"></i>
@@ -335,20 +409,20 @@ if (!isset($_SESSION['user_id'])) {
                             </div>
                             <div class="px-2">
                                 <i class="fa fa-road text-primary mr-1"></i>
-                                <span>25K</span>
+                                <span>20K</span>
                             </div>
                         </div>
-                        <a class="btn btn-primary px-3" href="">₹5000/Day</a>
+                        <a class="btn btn-primary px-3" href="booking.html">₹5000/Day</a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-2">
                     <div class="rent-item active mb-4">
-                        <img class="img-fluid mb-4" src="img/car-rent-2.png" alt="">
-                        <h4 class="text-uppercase mb-4">Mercedes Benz R3</h4>
+                        <img class="img-fluid mb-4" src="img/car-rent-2.jpg" alt="">
+                        <h4 class="text-uppercase mb-4">Toyota Fortuner</h4>
                         <div class="d-flex justify-content-center mb-4">
                             <div class="px-2">
                                 <i class="fa fa-car text-primary mr-1"></i>
-                                <span>2015</span>
+                                <span>2018</span>
                             </div>
                             <div class="px-2 border-left border-right">
                                 <i class="fa fa-cogs text-primary mr-1"></i>
@@ -359,17 +433,17 @@ if (!isset($_SESSION['user_id'])) {
                                 <span>25K</span>
                             </div>
                         </div>
-                        <a class="btn btn-primary px-3" href="">₹9900/Day</a>
+                        <a class="btn btn-primary px-3" href="booking.html">₹8900/Day</a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-2">
                     <div class="rent-item mb-4">
-                        <img class="img-fluid mb-4" src="img/car-rent-3.png" alt="">
-                        <h4 class="text-uppercase mb-4">Mercedes Benz R3</h4>
+                        <img class="img-fluid mb-4" src="img/car-rent-6.jpg" alt="">
+                        <h4 class="text-uppercase mb-4">Hyundai Verna</h4>
                         <div class="d-flex justify-content-center mb-4">
                             <div class="px-2">
                                 <i class="fa fa-car text-primary mr-1"></i>
-                                <span>2015</span>
+                                <span>2019</span>
                             </div>
                             <div class="px-2 border-left border-right">
                                 <i class="fa fa-cogs text-primary mr-1"></i>
@@ -377,20 +451,20 @@ if (!isset($_SESSION['user_id'])) {
                             </div>
                             <div class="px-2">
                                 <i class="fa fa-road text-primary mr-1"></i>
-                                <span>25K</span>
+                                <span>15K</span>
                             </div>
                         </div>
-                        <a class="btn btn-primary px-3" href="">₹6500/Day</a>
+                        <a class="btn btn-primary px-3" href="booking.html">₹3500/Day</a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-2">
                     <div class="rent-item mb-4">
-                        <img class="img-fluid mb-4" src="img/car-rent-4.png" alt="">
-                        <h4 class="text-uppercase mb-4">Mercedes Benz R3</h4>
+                        <img class="img-fluid mb-4" src="img/car-rent-4.jpeg" alt="">
+                        <h4 class="text-uppercase mb-4">Hyundai Creta</h4>
                         <div class="d-flex justify-content-center mb-4">
                             <div class="px-2">
                                 <i class="fa fa-car text-primary mr-1"></i>
-                                <span>2015</span>
+                                <span>2019</span>
                             </div>
                             <div class="px-2 border-left border-right">
                                 <i class="fa fa-cogs text-primary mr-1"></i>
@@ -398,16 +472,16 @@ if (!isset($_SESSION['user_id'])) {
                             </div>
                             <div class="px-2">
                                 <i class="fa fa-road text-primary mr-1"></i>
-                                <span>25K</span>
+                                <span>18K</span>
                             </div>
                         </div>
-                        <a class="btn btn-primary px-3" href="">₹9905/Day</a>
+                        <a class="btn btn-primary px-3" href="booking.html">₹4500/Day</a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-2">
                     <div class="rent-item mb-4">
-                        <img class="img-fluid mb-4" src="img/car-rent-5.png" alt="">
-                        <h4 class="text-uppercase mb-4">Mercedes Benz R3</h4>
+                        <img class="img-fluid mb-4" src="img/car-rent-5.jpeg" alt="">
+                        <h4 class="text-uppercase mb-4">Toyota Innova</h4>
                         <div class="d-flex justify-content-center mb-4">
                             <div class="px-2">
                                 <i class="fa fa-car text-primary mr-1"></i>
@@ -419,15 +493,15 @@ if (!isset($_SESSION['user_id'])) {
                             </div>
                             <div class="px-2">
                                 <i class="fa fa-road text-primary mr-1"></i>
-                                <span>25K</span>
+                                <span>20K</span>
                             </div>
                         </div>
-                        <a class="btn btn-primary px-3" href="">₹9989/Day</a>
+                        <a class="btn btn-primary px-3" href="booking.html">₹5009/Day</a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-2">
                     <div class="rent-item mb-4">
-                        <img class="img-fluid mb-4" src="img/car-rent-6.png" alt="">
+                        <img class="img-fluid mb-4" src="img/p.png" alt="">
                         <h4 class="text-uppercase mb-4">Mercedes Benz R3</h4>
                         <div class="d-flex justify-content-center mb-4">
                             <div class="px-2">
@@ -443,7 +517,7 @@ if (!isset($_SESSION['user_id'])) {
                                 <span>25K</span>
                             </div>
                         </div>
-                        <a class="btn btn-primary px-3" href="">₹15000/Day</a>
+                        <a class="btn btn-primary px-3" href="booking.html">₹15000/Day</a>
                     </div>
                 </div>
             </div>
@@ -457,40 +531,32 @@ if (!isset($_SESSION['user_id'])) {
         <div class="container py-5">
             <h1 class="display-1 text-primary text-center">04</h1>
             <h1 class="display-4 text-uppercase text-center mb-5">Meet Our Team</h1>
-            <div class="owl-carousel team-carousel position-relative" style="padding: 0 30px;">
-                <div class="team-item">
-                    <img class="img-fluid w-100" src="img/mdarshadnoor.png" alt="">
-                    <div class="position-relative py-4">
-                        <h4 class="text-uppercase">Md Arshad Noor</h4>
-                        <p class="m-0">Software Engineer</p>
-                        <div class="team-social position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
-                            <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="#"><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="#"><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="#"><i class="fab fa-linkedin-in"></i></a>
+            <div class="row justify-content-center">
+                <div class="col-lg-5 mx-2">
+                    <div class="team-item">
+                        <img class="img-fluid w-100" src="img/arvind.jpeg" alt="">
+                        <div class="position-relative py-4">
+                            <h4 class="text-uppercase">Arvind Singh Devra</h4>
+                            <p class="m-0"></p>
+                            <div class="team-social position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
+                                <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="https://x.com/?lang=en"><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="https://www.facebook.com/login/"><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="https://in.linkedin.com/"><i class="fab fa-linkedin-in"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="team-item">
-                    <img class="img-fluid w-100" src="img/satyam.jpeg" alt="">
-                    <div class="position-relative py-4">
-                        <h4 class="text-uppercase">Satyam Kumar</h4>
-                        <p class="m-0">Software Engineer</p>
-                        <div class="team-social position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
-                            <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="#"><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="#"><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="#"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="team-item">
-                    <img class="img-fluid w-100" src="img/aditya.jpeg" alt="">
-                    <div class="position-relative py-4">
-                        <h4 class="text-uppercase">Aditya More</h4>
-                        <p class="m-0">Software Engineer</p>
-                        <div class="team-social position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
-                            <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="#"><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="#"><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="#"><i class="fab fa-linkedin-in"></i></a>
+                <div class="col-lg-5 mx-2">
+                    <div class="team-item">
+                        <img class="img-fluid w-100" src="img/Abhishek.jpg" alt="">
+                        <div class="position-relative py-4">
+                            <h4 class="text-uppercase">Abhishek Kumar</h4>
+                            <p class="m-0"></p>
+                            <div class="team-social position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
+                                <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="https://x.com/?lang=en"><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="https://www.facebook.com/login/"><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-lg btn-primary btn-lg-square mx-1" href="https://in.linkedin.com/"><i class="fab fa-linkedin-in"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -554,15 +620,6 @@ if (!isset($_SESSION['user_id'])) {
                     <i class="mb-2">Blogger</i>
                     <p class="m-0">I am regular user of Akshay Lovely car. They provide us a good service at very affordable price.</p>
                 </div>
-                <div class="testimonial-item d-flex flex-column justify-content-center px-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <img class="img-fluid ml-n4" src="img/testimonial-3.jpg" alt="">
-                        <h1 class="display-2 text-white m-0 fa fa-quote-right"></h1>
-                    </div>
-                    <h4 class="text-uppercase mb-2">Aman</h4>
-                    <i class="mb-2">Crypto Trader</i>
-                    <p class="m-0">I rent car first time from Lovely Cars. I am very satisfied with their customer support and price range is also good at all.</p>
-                </div>
             </div>
         </div>
     </div>
@@ -577,24 +634,28 @@ if (!isset($_SESSION['user_id'])) {
             <div class="row">
                 <div class="col-lg-7 mb-2">
                     <div class="contact-form bg-light mb-4" style="padding: 30px;">
-                        <form action="save_contact.php" method="POST">
-                            <div class="row">
-                                <div class="col-6 form-group">
-                                    <input type="text" name="name" class="form-control p-4" placeholder="Your Name" required="required">
-                                </div>
-                                <div class="col-6 form-group">
-                                    <input type="email" name="email" class="form-control p-4" placeholder="Your Email" required="required">
-                                </div>
-                            </div>
+                        <form action="process_contact.php" method="POST">
                             <div class="form-group">
-                                <input type="text" name="subject" class="form-control p-4" placeholder="Subject" required="required">
+                                <label for="name">Name:</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
                             </div>
+
                             <div class="form-group">
-                                <textarea name="message" class="form-control py-3 px-4" rows="5" placeholder="Message" required="required"></textarea>
+                                <label for="email">Email:</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
                             </div>
-                            <div>
-                                <button class="btn btn-primary py-3 px-5" type="submit">Send Message</button>
+
+                            <div class="form-group">
+                                <label for="phone">Phone:</label>
+                                <input type="tel" class="form-control" id="phone" name="phone">
                             </div>
+
+                            <div class="form-group">
+                                <label for="message">Message:</label>
+                                <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Send Message</button>
                         </form>
                     </div>
                 </div>
@@ -604,14 +665,14 @@ if (!isset($_SESSION['user_id'])) {
                             <i class="fa fa-2x fa-map-marker-alt text-primary flex-shrink-0 mr-3"></i>
                             <div class="mt-n1">
                                 <h5 class="text-light">Head Office</h5>
-                                <p>GT Road, Near LPU, Jalandhar, Punjab</p>
+                                <p>Rani Road,Near Fateh Sagar,Udaipur,Rajasthan</p>
                             </div>
                         </div>
                         <div class="d-flex mb-3">
                             <i class="fa fa-2x fa-map-marker-alt text-primary flex-shrink-0 mr-3"></i>
                             <div class="mt-n1">
                                 <h5 class="text-light">Branch Office</h5>
-                                <p>GT Road, Near LPU, Jalandhar, Punjab</p>
+                                <p>Rani Road,Near Fateh Sagar,Udaipur,Rajasthan</p>
                             </div>
                         </div>
                         <div class="d-flex mb-3">
@@ -636,12 +697,107 @@ if (!isset($_SESSION['user_id'])) {
     <!-- Contact End -->
 
 
+    <!-- Reviews Section Start -->
+    <div class="container-fluid py-5">
+        <div class="container pt-5 pb-3">
+            <h1 class="display-1 text-primary text-center">06</h1>
+            <h1 class="display-4 text-uppercase text-center mb-5">Customer Reviews</h1>
+            <!-- Overall Rating -->
+            <div class="text-center mb-4">
+                <h3>Overall Rating: 4.8/5</h3>
+                <div class="d-flex justify-content-center">
+                    <i class="fa fa-star text-primary mx-1 fa-2x"></i>
+                    <i class="fa fa-star text-primary mx-1 fa-2x"></i>
+                    <i class="fa fa-star text-primary mx-1 fa-2x"></i>
+                    <i class="fa fa-star text-primary mx-1 fa-2x"></i>
+                    <i class="fa fa-star-half-alt text-primary mx-1 fa-2x"></i>
+                </div>
+                <p class="mt-2 text-muted">Based on 500+ Reviews</p>
+            </div>
+            <div class="row">
+                <!-- Review Card 1 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="bg-light p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5 class="text-uppercase">Luxury Car Experience</h5>
+                            <div class="d-flex">
+                                <i class="fa fa-star text-primary"></i>
+                                <i class="fa fa-star text-primary"></i>
+                                <i class="fa fa-star text-primary"></i>
+                                <i class="fa fa-star text-primary"></i>
+                                <i class="fa fa-star-half-alt text-primary"></i>
+                            </div>
+                        </div>
+                        <p class="mb-2">Amazing service! The car was in perfect condition and the staff was very helpful. Would definitely recommend!</p>
+                        <div class="d-flex align-items-center">
+                            <img class="img-fluid rounded-circle" src="img/testimonial-1.jpg" style="width: 50px; height: 50px;">
+                            <div class="ml-3">
+                                <h6 class="text-uppercase mb-1">Rahul Singh</h6>
+                                <span class="text-muted">Business Executive</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Card 2 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="bg-light p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5 class="text-uppercase">Perfect Family Trip</h5>
+                            <div class="d-flex">
+                                <i class="fa fa-star text-primary"></i>
+                                <i class="fa fa-star text-primary"></i>
+                                <i class="fa fa-star text-primary"></i>
+                                <i class="fa fa-star text-primary"></i>
+                                <i class="fa fa-star text-primary"></i>
+                            </div>
+                        </div>
+                        <p class="mb-2">Outstanding experience! Rented an SUV for our family trip. Very comfortable and well-maintained vehicle.</p>
+                        <div class="d-flex align-items-center">
+                            <img class="img-fluid rounded-circle" src="img/testimonial-2.jpg" style="width: 50px; height: 50px;">
+                            <div class="ml-3">
+                                <h6 class="text-uppercase mb-1">Priya Sharma</h6>
+                                <span class="text-muted">Teacher</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Card 3 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="bg-light p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5 class="text-uppercase">Business Travel Made Easy</h5>
+                            <div class="d-flex">
+                                <i class="fa fa-star text-primary"></i>
+                                <i class="fa fa-star text-primary"></i>
+                                <i class="fa fa-star text-primary"></i>
+                                <i class="fa fa-star text-primary"></i>
+                                <i class="fa fa-star text-primary"></i>
+                            </div>
+                        </div>
+                        <p class="mb-2">Exceptional service! Professional, punctual delivery, and excellent car condition. Best car rental service!</p>
+                        <div class="d-flex align-items-center">
+                            <img class="img-fluid rounded-circle" src="img/testimonial-3.jpg" style="width: 50px; height: 50px;">
+                            <div class="ml-3">
+                                <h6 class="text-uppercase mb-1">Amit Patel</h6>
+                                <span class="text-muted">Software Engineer</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Reviews Section End -->
+
+
     <!-- Footer Start -->
     <div class="container-fluid bg-secondary py-5 px-sm-3 px-md-5" style="margin-top: 90px;">
         <div class="row pt-5">
             <div class="col-lg-3 col-md-6 mb-5">
                 <h4 class="text-uppercase text-light mb-4">Get In Touch</h4>
-                <p class="mb-2"><i class="fa fa-map-marker-alt text-white mr-3"></i>GT Road, Near LPU, Jalandhar, Punjab</p>
+                <p class="mb-2"><i class="fa fa-map-marker-alt text-white mr-3"></i>Rani Road, Near Fateh Sagar, Udaipur, Rajasthan</p>
                 <p class="mb-2"><i class="fa fa-phone-alt text-white mr-3"></i>+91-0000000000</p>
                 <p><i class="fa fa-envelope text-white mr-3"></i>info@lovelycars.com</p>
                 <h6 class="text-uppercase text-white py-2">Follow Us</h6>
@@ -726,6 +882,167 @@ if (!isset($_SESSION['user_id'])) {
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
+    <script>
+        // Remove the team carousel initialization since we're not using it anymore
+        // Only keep other carousel settings
+        $('.testimonial-carousel').owlCarousel({
+            autoplay: false,
+            loop: false,
+            nav: false,
+            dots: false,
+            responsive: {
+                0: {
+                    items: 1
+                },
+                768: {
+                    items: 2
+                }
+            }
+        });
+    </script>
+    <script>
+    function updateTimeMin(selectedDate) {
+        var now = new Date();
+        var selected = new Date(selectedDate);
+        
+        // If selected date is today, set min time to current time
+        if (selected.toDateString() === now.toDateString()) {
+            var hh = String(now.getHours()).padStart(2, '0');
+            var min = String(now.getMinutes()).padStart(2, '0');
+            document.querySelector('input[type="time"]').min = hh + ':' + min;
+        } else {
+            // If future date, allow any time
+            document.querySelector('input[type="time"]').min = '';
+        }
+    }
+
+    // Initialize date and time restrictions when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set min date to today
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        var currentDate = yyyy + '-' + mm + '-' + dd;
+        
+        // Set min time to current time
+        var hh = String(today.getHours()).padStart(2, '0');
+        var min = String(today.getMinutes()).padStart(2, '0');
+        var currentTime = hh + ':' + min;
+
+        // Set minimum values
+        var dateInputs = document.querySelectorAll('input[type="date"]');
+        var timeInputs = document.querySelectorAll('input[type="time"]');
+        
+        dateInputs.forEach(function(input) {
+            input.min = currentDate;
+        });
+        
+        timeInputs.forEach(function(input) {
+            input.min = currentTime;
+        });
+    });
+
+    // Update existing validateForm function
+    function validateForm() {
+        var pickup = document.forms["bookingForm"]["pickup_location"].value;
+        var drop = document.forms["bookingForm"]["drop_location"].value;
+        var date = document.forms["bookingForm"]["date"].value;
+        var time = document.forms["bookingForm"]["time"].value;
+        var car = document.forms["bookingForm"]["car_model"].value;
+
+        if (pickup == "" || drop == "" || date == "" || time == "" || car == "") {
+            alert("Please fill all the fields");
+            return false;
+        }
+
+        var formData = new FormData(document.forms["bookingForm"]);
+        
+        fetch('save_booking.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response:', data); // For debugging
+            if(data.success) {
+                // Update driver details
+                document.getElementById('driverName').textContent = data.driver.name;
+                document.getElementById('driverPhone').textContent = "Phone: " + data.driver.phone;
+                document.getElementById('vehicleModel').textContent = data.vehicle.model;
+                document.getElementById('vehicleColor').textContent = data.vehicle.color;
+                document.getElementById('vehicleNumber').textContent = data.vehicle.number;
+                document.getElementById('eta').textContent = data.vehicle.eta;
+                
+                // Show booking tracker
+                showBookingTracker();
+                
+                // Hide booking section
+                document.getElementById('booking-section').style.display = 'none';
+            } else {
+                alert('Booking failed: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while processing your booking. Please try again.');
+        });
+
+        return false;
+    }
+
+    function showBookingTracker() {
+        document.getElementById('bookingTracker').style.display = 'block';
+        document.getElementById('bookingTracker').scrollIntoView({ behavior: 'smooth' });
+        updateBookingProgress();
+    }
+
+    function updateBookingProgress() {
+        let progress = 0;
+        const progressBar = document.getElementById('bookingProgressBar');
+        const badges = document.querySelectorAll('.booking-progress .badge');
+        
+        const stages = [25, 50, 75, 100];
+        let currentStage = 0;
+
+        const progressInterval = setInterval(() => {
+            if (currentStage >= stages.length) {
+                clearInterval(progressInterval);
+                return;
+            }
+
+            progress = stages[currentStage];
+            progressBar.style.width = progress + '%';
+            
+            // Update badges
+            badges.forEach((badge, index) => {
+                if (index <= currentStage) {
+                    badge.classList.remove('badge-secondary');
+                    badge.classList.add('badge-primary');
+                }
+            });
+
+            currentStage++;
+        }, 5000); // Update every 5 seconds
+    }
+
+    function contactDriver() {
+        const driverPhone = document.getElementById('driverPhone').textContent.split(': ')[1];
+        window.location.href = `tel:${driverPhone}`;
+    }
+
+    function cancelBooking() {
+        if (confirm('Are you sure you want to cancel this booking?')) {
+            alert('Booking cancelled successfully');
+            document.getElementById('bookingTracker').style.display = 'none';
+        }
+    }
+    </script>
 </body>
 
 </html>

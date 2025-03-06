@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Lovely Cars</title>
+    <title>Register - Lovely Cars</title>
     <style>
         body {
             margin: 0;
@@ -29,7 +29,7 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 1;
         }
-        .login-container {
+        .register-container {
             background: rgba(255, 255, 255, 0.9);
             padding: 40px;
             border-radius: 10px;
@@ -39,7 +39,7 @@
             position: relative;
             z-index: 2;
         }
-        .login-container h2 {
+        .register-container h2 {
             text-align: center;
             color: #F77D0A;
             margin-bottom: 30px;
@@ -59,7 +59,7 @@
             border-radius: 5px;
             box-sizing: border-box;
         }
-        .login-btn {
+        .register-btn {
             background: #F77D0A;
             color: white;
             padding: 12px;
@@ -70,8 +70,16 @@
             font-size: 16px;
             transition: background 0.3s;
         }
-        .login-btn:hover {
+        .register-btn:hover {
             background: #d66a06;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .login-link a {
+            color: #F77D0A;
+            text-decoration: none;
         }
         .error-message {
             color: red;
@@ -79,20 +87,24 @@
             margin-top: 10px;
             display: none;
         }
-        .register-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .register-link a {
-            color: #F77D0A;
-            text-decoration: none;
-        }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Lovely Cars Login</h2>
-        <form id="loginForm" action="login.php" method="POST">
+    <div class="register-container">
+        <h2>Create Account</h2>
+        <form id="registerForm" action="register.php" method="POST">
+            <div class="form-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" id="fullname" name="fullname" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required>
@@ -101,12 +113,31 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit" class="login-btn">Login</button>
-            <div class="register-link">
-                Don't have an account? <a href="register.html">Register here</a>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+            <button type="submit" class="register-btn">Register</button>
+            <p id="errorMessage" class="error-message"></p>
+            <div class="login-link">
+                Already have an account? <a href="login.html">Login here</a>
             </div>
         </form>
     </div>
-</body>
-</html>
 
+    <script>
+        document.getElementById('registerForm').onsubmit = function(e) {
+            const password = document.getElementById('password').value;
+            const confirm_password = document.getElementById('confirm_password').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            if (password !== confirm_password) {
+                e.preventDefault();
+                errorMessage.textContent = "Passwords do not match!";
+                errorMessage.style.display = 'block';
+                return false;
+            }
+        }
+    </script>
+</body>
+</html> 
